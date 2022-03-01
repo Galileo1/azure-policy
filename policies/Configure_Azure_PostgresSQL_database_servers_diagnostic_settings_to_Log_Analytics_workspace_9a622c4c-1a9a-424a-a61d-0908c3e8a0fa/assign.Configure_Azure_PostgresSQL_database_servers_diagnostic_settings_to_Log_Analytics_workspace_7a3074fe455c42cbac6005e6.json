@@ -1,0 +1,41 @@
+{
+ "sku": {
+  "name": "A0",
+  "tier": "Free"
+ },
+ "identity": {
+  "principalId": "f334666b-7507-4f44-8d79-17d6271dcff4",
+  "tenantId": "e6d2d4cc-b762-486e-8894-4f5f440d5f31",
+  "type": "SystemAssigned"
+ },
+ "properties": {
+  "displayName": "Configure Azure PostgresSQL database servers diagnostic settings to Log Analytics workspace",
+  "policyDefinitionId": "/subscriptions/ee8fa627-145b-4942-89bd-64e20c540a6a/providers/Microsoft.Authorization/policyDefinitions/9a622c4c-1a9a-424a-a61d-0908c3e8a0fa",
+  "scope": "/subscriptions/ee8fa627-145b-4942-89bd-64e20c540a6a",
+  "notScopes": [],
+  "parameters": {
+   "logAnalytics": {
+    "value": "/subscriptions/ee8fa627-145b-4942-89bd-64e20c540a6a/resourcegroups/defaultresourcegroup-eau/providers/microsoft.operationalinsights/workspaces/defaultworkspace-ee8fa627-145b-4942-89bd-64e20c540a6a-eau"
+   },
+   "PostgreSQLLogsEnabled": {
+    "value": "True"
+   }
+  },
+  "description": "",
+  "metadata": {
+   "assignedBy": "Varun Gaur",
+   "parameterScopes": {
+    "logAnalytics": "/subscriptions/ee8fa627-145b-4942-89bd-64e20c540a6a"
+   },
+   "createdBy": "c2f2bd93-4c4e-4d47-ace1-6bc953cee898",
+   "createdOn": "2022-02-28T21:00:45.1602534Z",
+   "updatedBy": "c2f2bd93-4c4e-4d47-ace1-6bc953cee898",
+   "updatedOn": "2022-03-01T00:25:48.083471Z"
+  },
+  "enforcementMode": "Default"
+ },
+ "id": "/subscriptions/ee8fa627-145b-4942-89bd-64e20c540a6a/providers/Microsoft.Authorization/policyAssignments/7a3074fe455c42cbac6005e6",
+ "type": "Microsoft.Authorization/policyAssignments",
+ "name": "7a3074fe455c42cbac6005e6",
+ "location": "australiaeast"
+}

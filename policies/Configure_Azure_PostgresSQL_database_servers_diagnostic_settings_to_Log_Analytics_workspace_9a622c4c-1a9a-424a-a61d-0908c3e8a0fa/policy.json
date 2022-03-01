@@ -1,0 +1,227 @@
+{
+ "properties": {
+  "displayName": "Configure Azure PostgresSQL database servers diagnostic settings to Log Analytics workspace",
+  "policyType": "Custom",
+  "mode": "Indexed",
+  "metadata": {
+   "category": "SQL",
+   "createdBy": "c2f2bd93-4c4e-4d47-ace1-6bc953cee898",
+   "createdOn": "2022-02-28T20:45:22.1196375Z",
+   "updatedBy": "c2f2bd93-4c4e-4d47-ace1-6bc953cee898",
+   "updatedOn": "2022-02-28T22:17:13.0025497Z"
+  },
+  "parameters": {
+   "effect": {
+    "type": "String",
+    "metadata": {
+     "displayName": "Effect",
+     "description": "Enable or disable the execution of the policy"
+    },
+    "allowedValues": [
+     "DeployIfNotExists",
+     "Disabled"
+    ],
+    "defaultValue": "DeployIfNotExists"
+   },
+   "diagnosticsSettingNameToUse": {
+    "type": "String",
+    "metadata": {
+     "displayName": "Setting name",
+     "description": "Name of the diagnostic settings."
+    },
+    "defaultValue": "PSQLDatabaseDiagnosticsLogsToWorkspace"
+   },
+   "logAnalytics": {
+    "type": "String",
+    "metadata": {
+     "displayName": "Log Analytics workspace",
+     "description": "Specify the Log Analytics workspace.",
+     "strongType": "omsWorkspace",
+     "assignPermissions": true
+    }
+   },
+   "QueryStoreRuntimeStatisticsEnabled": {
+    "type": "String",
+    "metadata": {
+     "displayName": "QueryStoreRuntimeStatistics - Enabled",
+     "description": "Whether to stream QueryStoreRuntimeStatistics logs to the Log Analytics workspace - True or False"
+    },
+    "allowedValues": [
+     "True",
+     "False"
+    ],
+    "defaultValue": "False"
+   },
+   "PostgreSQLLogsEnabled": {
+    "type": "String",
+    "metadata": {
+     "displayName": "PostgreSQLLogs - Enabled",
+     "description": "Whether to stream PostgreSQLLogs logs to the Log Analytics workspace - True or False"
+    },
+    "allowedValues": [
+     "True",
+     "False"
+    ],
+    "defaultValue": "False"
+   },
+   "QueryStoreWaitStatisticsEnabled": {
+    "type": "String",
+    "metadata": {
+     "displayName": "QueryStoreWaitStatistics - Enabled",
+     "description": "Whether to stream QueryStoreWaitStatistics logs to the Log Analytics workspace - True or False"
+    },
+    "allowedValues": [
+     "True",
+     "False"
+    ],
+    "defaultValue": "False"
+   },
+   "metricsEnabled": {
+    "type": "String",
+    "metadata": {
+     "displayName": "AllMetrics - Enabled",
+     "description": "Whether to stream Metrics logs to the Log Analytics workspace - True or False"
+    },
+    "allowedValues": [
+     "True",
+     "False"
+    ],
+    "defaultValue": "False"
+   }
+  },
+  "policyRule": {
+   "if": {
+    "field": "type",
+    "equals": "Microsoft.DBforPostgreSQL/servers"
+   },
+   "then": {
+    "effect": "[parameters('effect')]",
+    "details": {
+     "type": "Microsoft.Insights/diagnosticSettings",
+     "roleDefinitionIds": [
+      "/providers/microsoft.authorization/roleDefinitions/749f88d5-cbae-40b8-bcfc-e573ddc772fa",
+      "/providers/microsoft.authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293"
+     ],
+     "existenceCondition": {
+      "allOf": [
+       {
+        "count": {
+         "field": "Microsoft.Insights/diagnosticSettings/logs[*]",
+         "where": {
+          "allOf": [
+           {
+            "field": "Microsoft.Insights/diagnosticSettings/logs[*].enabled",
+            "equals": "[parameters('PostgreSQLLogsEnabled')]"
+           },
+           {
+            "field": "Microsoft.Insights/diagnosticSettings/logs[*].category",
+            "equals": "PostgreSQLLogsEnabled"
+           }
+          ]
+         }
+        },
+        "greater": 0
+       },
+       {
+        "field": "Microsoft.Insights/diagnosticSettings/workspaceId",
+        "matchInsensitively": "[parameters('logAnalytics')]"
+       }
+      ]
+     },
+     "deployment": {
+      "properties": {
+       "mode": "incremental",
+       "template": {
+        "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+        "contentVersion": "1.0.0.0",
+        "parameters": {
+         "diagnosticsSettingNameToUse": {
+          "type": "string"
+         },
+         "logAnalytics": {
+          "type": "string"
+         },
+         "location": {
+          "type": "string"
+         },
+         "QueryStoreRuntimeStatisticsEnabled": {
+          "type": "string"
+         },
+         "QueryStoreWaitStatisticsEnabled": {
+          "type": "string"
+         },
+         "PostgreSQLLogsEnabled": {
+          "type": "string"
+         },
+         "metricsEnabled": {
+          "type": "string"
+         }
+        },
+        "variables": {},
+        "resources": [
+         {
+          "type": "Microsoft.DBforPostgreSQL/servers/providers/diagnosticSettings",
+          "apiVersion": "2017-05-01-preview",
+          "name": "[concat('varun-pgsql', '/', 'Microsoft.Insights/', parameters('diagnosticsSettingNameToUse'))]",
+          "location": "[parameters('location')]",
+          "dependsOn": [],
+          "properties": {
+           "workspaceId": "[parameters('logAnalytics')]",
+           "metrics": [
+            {
+             "category": "AllMetrics",
+             "enabled": "[parameters('metricsEnabled')]"
+            }
+           ],
+           "logs": [
+            {
+             "category": "QueryStoreRuntimeStatistics",
+             "enabled": "[parameters('QueryStoreRuntimeStatisticsEnabled')]"
+            },
+            {
+             "category": "PostgreSQLLogs",
+             "enabled": "[parameters('PostgreSQLLogsEnabled')]"
+            },
+            {
+             "category": "QueryStoreWaitStatistics",
+             "enabled": "[parameters('QueryStoreWaitStatisticsEnabled')]"
+            }
+           ]
+          }
+         }
+        ],
+        "outputs": {}
+       },
+       "parameters": {
+        "diagnosticsSettingNameToUse": {
+         "value": "[parameters('diagnosticsSettingNameToUse')]"
+        },
+        "logAnalytics": {
+         "value": "[parameters('logAnalytics')]"
+        },
+        "location": {
+         "value": "[field('location')]"
+        },
+        "QueryStoreRuntimeStatisticsEnabled": {
+         "value": "[parameters('QueryStoreRuntimeStatisticsEnabled')]"
+        },
+        "QueryStoreWaitStatisticsEnabled": {
+         "value": "[parameters('QueryStoreWaitStatisticsEnabled')]"
+        },
+        "PostgreSQLLogsEnabled": {
+         "value": "[parameters('PostgreSQLLogsEnabled')]"
+        },
+        "metricsEnabled": {
+         "value": "[parameters('metricsEnabled')]"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "id": "/subscriptions/ee8fa627-145b-4942-89bd-64e20c540a6a/providers/Microsoft.Authorization/policyDefinitions/9a622c4c-1a9a-424a-a61d-0908c3e8a0fa",
+ "type": "Microsoft.Authorization/policyDefinitions",
+ "name": "9a622c4c-1a9a-424a-a61d-0908c3e8a0fa"
+}

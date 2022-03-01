@@ -1,0 +1,32 @@
+name: manage-azure-policy-63b1bfdb
+on:
+  workflow_dispatch:
+    inputs:
+      remarks:
+        description: 'Reason for triggering the workflow run'
+        required: false
+        default: 'Updating Azure Policies'
+
+
+## Uncomment the following if you wish to automatically trigger workflow run with every commit
+#
+#  push:
+#    paths:
+#      - 'policies/Configure_Azure_PostgresSQL_database_servers_diagnostic_settings_to_Log_Analytics_workspace_9a622c4c-1a9a-424a-a61d-0908c3e8a0fa/**'
+#      - .github/workflows/manage-azure-policy-63b1bfdb.yml
+jobs:
+  apply-azure-policy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{secrets.AZURE_CREDENTIALS_63b1bfdb}}
+        allow-no-subscriptions: true
+    - name: Create or Update Azure Policies
+      uses: azure/manage-azure-policy@v0
+      with:
+        paths: |
+          policies/Configure_Azure_PostgresSQL_database_servers_diagnostic_settings_to_Log_Analytics_workspace_9a622c4c-1a9a-424a-a61d-0908c3e8a0fa/**
